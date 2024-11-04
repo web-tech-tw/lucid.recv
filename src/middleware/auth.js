@@ -19,10 +19,6 @@ const authMethods = {
     "TEST": testTokenAuth.validate,
 };
 
-// Check if the function will return a Promise
-const isAsync = (func) =>
-    func.constructor.name === "AsyncFunction";
-
 // Export (function)
 module.exports = async (req, _, next) => {
     const authCode = req.header("authorization");
@@ -50,16 +46,13 @@ module.exports = async (req, _, next) => {
     }
 
     const authMethod = authMethods[method];
-    const authResult = isAsync(authMethod) ?
-        await authMethod(secret) :
-        authMethod(secret);
+    const authResult = await authMethod(secret);
 
     if (!isProduction()) {
         // Debug message
         console.warn(
             "An authentication detected:",
-            authMethod,
-            authResult,
+            method, authResult,
             "\n",
         );
     }
